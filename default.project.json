@@ -1,0 +1,38 @@
+{
+  "name": "Infinity 5 Template",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedFirst": {
+      "$className": "ReplicatedFirst",
+      "$ignoreUnknownInstances": true,
+      "$path": "src/first"
+    },
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "$ignoreUnknownInstances": true,
+      "$path": "src/shared",
+      "Infinity": {
+        "$path": "_loader/shared.project.json"
+      }
+    },
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "$ignoreUnknownInstances": true,
+      "$path": "src/server"
+    },
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "$ignoreUnknownInstances": true,
+      "StarterCharacterScripts": {
+        "$className": "StarterCharacterScripts",
+        "$ignoreUnknownInstances": true,
+        "$path": "src/character"
+      },
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "$ignoreUnknownInstances": true,
+        "$path": "src/client"
+      }
+    }
+  }
+}
