@@ -47,7 +47,6 @@ function deep_copy(source: table, target: table): table|nil
     
     if type(source) == 'table' then
         for index, value in next, source, nil do
-            --print('Copying', index, value)
             rawset(result, deep_copy(index), deep_copy(value))
         end
         
