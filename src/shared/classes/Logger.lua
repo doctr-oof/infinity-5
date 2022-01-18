@@ -23,6 +23,9 @@
             
             <boolean> ListenersEnabled (default: true)
                 -> Enables or disables property and attribute listening on the Logger.
+            
+            <boolean> LoggingEnabled (default: true)
+                -> Enables/disables all logging capabilities for the current Logger.
         
         Functions:
             <void> ::Print(message: string[, ...])
@@ -40,11 +43,11 @@
                    ::error(message: string[, ...]) (alternate)
                 -> Outputs a formattable error message with optional tuple-supplied values.
             
-            <void> ::Pause()
+            <void> ::PauseListeners()
                    ::pause() (alternate)
                 -> Disables property and attribute listening on the Logger.
             
-            <void> ::Resume()
+            <void> ::ResumeListeners()
                    ::resume() (alternate)
                 -> Enables property and attribute listening on the Logger.
             
@@ -72,6 +75,8 @@ local classify          = require('$lib/Classify')
 
 --= Class API =--
 function Logger:Print(message: string, ...): nil
+    if not self.LoggingEnabled then return end
+    
     local final_str
     
     if self.Name ~= '' then
@@ -90,6 +95,8 @@ function Logger:Print(message: string, ...): nil
 end
 
 function Logger:Warn(message: string, ...): nil
+    if not self.LoggingEnabled then return end
+    
     local final_str
     
     if self.Name ~= '' then
@@ -108,6 +115,8 @@ function Logger:Warn(message: string, ...): nil
 end
 
 function Logger:Error(message: string, ...): nil
+    if not self.LoggingEnabled then return end
+    
     local final_str
     
     if self.Name ~= '' then
@@ -125,32 +134,36 @@ function Logger:Error(message: string, ...): nil
     error(final_str, 2)
 end
 
-function Logger:Pause(): nil
+function Logger:PauseListeners(): nil
     self._listen = false
 end
 
-function Logger:Resume(): nil
+function Logger:ResumeListeners(): nil
     self._listen = true
 end
 
 function Logger:ListenToProperty(target: Instance, property: string): RBXScriptSignal
     local last = target[property]
-    
-    self:_mark_disposable(target:GetPropertyChangedSignal(property):Connect(function()
-        if not self.ListenersEnabled then return end
+    local connection = target:GetPropertyChangedSignal(property):Connect(function()
+        if not self.ListenersEnabled or not self.LoggingEnabled then return end
         self:Print('Property %q changed on %s: %q -> %q', property, target.Name, last, target[property])
         last = target[property]
-    end))
+    end)
+    
+    self:_mark_disposable(connection)
+    return connection
 end
 
 function Logger:ListenToAttribute(target: Instance, attribute: string): RBXScriptSignal
     local last = target[attribute]
-    
-    self:_mark_disposable(target:GetAttributeChangedSignal(attribute):Connect(function()
-        if not self.ListenersEnabled then return end
+    local connection = target:GetAttributeChangedSignal(attribute):Connect(function()
+        if not self.ListenersEnabled or not self.LoggingEnabled then return end
         self:Print('Attribute %q changed on %s: %q -> %q', attribute, target.Name, last, target[attribute])
         last = target[attribute]
-    end))
+    end)
+    
+    self:_mark_disposable(connection)
+    return connection
 end
 
 Logger.print = Logger.Print
@@ -168,12 +181,17 @@ function Logger.new(): any
     self._name = ''
     self._timestamps = false
     self._listen = true
+    self._enabled = true
     
     return self
 end
 
 --= Class Properties =--
 Logger.__properties = {
+    LoggingEnabled = {
+        bind = '_enabled',
+        target = function(self) return self end
+    },
     ListenersEnabled = {
         bind = '_listen',
         target = function(self) return self end
