@@ -22,21 +22,21 @@
 --]]
 
 --= Module Root =--
-local module    = { }
+local Platform      = { }
 
 --= Roblox Services =--
-local input_svc = game:GetService('UserInputService')
-local gui_svc   = game:GetService('GuiService')
+local input_svc     = game:GetService('UserInputService')
+local gui_svc       = game:GetService('GuiService')
 
 --= Flags =--
-module.IS_CONSOLE = gui_svc:IsTenFootInterface()
+Platform.IS_CONSOLE = gui_svc:IsTenFootInterface()
 
-module.IS_MOBILE = input_svc.TouchEnabled
-                   and not input_svc.KeyboardEnabled
-                   and not input_svc.MouseEnabled and not input_svc.GamepadEnabled
-                   and not gui_svc:IsTenFootInterface()
+Platform.IS_MOBILE  = input_svc.TouchEnabled
+                    and not input_svc.KeyboardEnabled
+                    and not input_svc.MouseEnabled and not input_svc.GamepadEnabled
+                    and not gui_svc:IsTenFootInterface()
 
-module.IS_PC = not module.IS_CONSOLE and not module.IS_MOBILE
+Platform.IS_PC      = not Platform.IS_CONSOLE and not Platform.IS_MOBILE
 
 --= Return Module =--
-return module
+return Platform
