@@ -1,45 +1,53 @@
---- Holds utilty math functions not available on Roblox's math library
--- @module Math
+--[[
+       __  ___     __  __
+      /  |/  /__ _/ /_/ /
+     / /|_/ / _ `/ __/ _ \
+    /_/  /_/\_,_/\__/_//_/
+    By FriendlyBiscuit
+    01/18/2022 @ 13:34:01
+    
+    Description:
+        Provides a set of utility math functions that are not included in the default Roblox
+        math library.
+        
+        Based of Quenty's math module.
+    
+    Documentation:
+        No documentation provided.
+--]]
 
-local Math = {}
+--= Module Root =--
+local Math = { }
 
---- Maps a number from one range to another
-function Math.map(num, min0, max0, min1, max1)
+--= Functions =--
+function Math.Map(input: number, min0: number, max0: number, min1: number, max1: number): number
 	if max0 == min0 then
-		error("Range of zero")
+		error('Cannot map inputs with a range of zero.', 2)
 	end
-
-	return (((num - min0)*(max1 - min1)) / (max0 - min0)) + min1
+    
+	return (((input - min0)*(max1 - min1)) / (max0 - min0)) + min1
 end
 
-function Math.smap(num, min1, max1)
-	return (((num - 0)*(max1 - min1)) / (1 - 0)) + min1
+function Math.StaticMap(input: number, min1: number, max1: number): number
+	return (((input - 0)*(max1 - min1)) / (1 - 0)) + min1
 end
 
---- Interpolates betweeen two numbers, given an percent
--- @tparam {number} num0 Number
--- @tparam {number} num1 Second number
--- @tparam {number} percent The percent, a number in the range that will be used to define
---              how interpolated it is between num0 and num1
--- @treturn {number} The interpolated
-function Math.lerp(num0, num1, percent)
-	return num0 + ((num1 - num0) * percent)
+function Math.Lerp(num0: number, num1: number, percent: number): number
+    return num0 + ((num1 - num0) * percent)
 end
 
---- Solving for angle across from c
-function Math.lawOfCosines(a, b, c)
+function Math.LawOfCos(a: number, b: number, c: number): number|nil
 	local l = (a*a + b*b - c*c) / (2 * a * b)
 	local angle = math.acos(l)
+    
 	if angle ~= angle then
 		return nil
 	end
+    
 	return angle
 end
 
---- Round the given number to given precision
--- @tparam {number} number
--- @tparam[opt=1] {number} precision
-function Math.round(number, precision)
+function Math.Round(number: number, precision: number): number
 	if precision then
 		return math.floor((number/precision) + 0.5) * precision
 	else
@@ -47,12 +55,22 @@ function Math.round(number, precision)
 	end
 end
 
-function Math.roundUp(number, precision)
+function Math.RoundUp(number: number, precision: number): number
 	return math.ceil(number/precision) * precision
 end
 
-function Math.roundDown(number, precision)
+function Math.RoundDown(number: number, precision: number): number
 	return math.floor(number/precision) * precision
 end
 
+--= Casing Support =--
+Math.map = Math.Map
+Math.staticMap = Math.StaticMap
+Math.lerp = Math.Lerp
+Math.lawOfCos = Math.LawOfCos
+Math.round = Math.Round
+Math.roundUp = Math.RoundUp
+Math.roundDown = Math.RoundDown
+
+--= Return Module =--
 return Math
