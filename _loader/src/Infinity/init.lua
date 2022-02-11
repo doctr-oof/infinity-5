@@ -40,7 +40,7 @@ function get_root_path(first_node: string): any
 end
 
 --= Main Loader Function =--
-function SkateworksLoader(query: string|ModuleScript): any
+function Infinity(query: string|ModuleScript): any
     if type(query) == 'string' then
         local nodes = split(query)
         local root, fix_len = get_root_path(nodes[1])
@@ -68,4 +68,4 @@ function SkateworksLoader(query: string|ModuleScript): any
 end
 
 --= Return =--
-return SkateworksLoader
+return Infinity
