@@ -80,13 +80,13 @@ function Logger:Print(message: string, ...): nil
     local final_str
     
     if self.Name ~= '' then
-        final_str = ('[%s]'):format(self.Name) .. message
+        final_str = ('[%s] '):format(self.Name) .. message
     else
         final_str = message
     end
     
     if #{...} > 0 then
-        for _, data in pairs(...) do
+        for _, data in pairs({...}) do
             final_str = final_str:format(data)
         end
     end
@@ -100,13 +100,13 @@ function Logger:Warn(message: string, ...): nil
     local final_str
     
     if self.Name ~= '' then
-        final_str = ('[%s]'):format(self.Name) .. message
+        final_str = ('[%s] '):format(self.Name) .. message
     else
         final_str = message
     end
     
     if #{...} > 0 then
-        for _, data in pairs(...) do
+        for _, data in pairs({...}) do
             final_str = final_str:format(data)
         end
     end
@@ -120,13 +120,13 @@ function Logger:Error(message: string, ...): nil
     local final_str
     
     if self.Name ~= '' then
-        final_str = ('[%s]'):format(self.Name) .. message
+        final_str = ('[%s] '):format(self.Name) .. message
     else
         final_str = message
     end
     
     if #{...} > 0 then
-        for _, data in pairs(...) do
+        for _, data in pairs({...}) do
             final_str = final_str:format(data)
         end
     end
@@ -175,10 +175,10 @@ Logger.listenToProperty = Logger.ListenToProperty
 Logger.listenToAttribute = Logger.ListenToAttribute
 
 --= Class Constructor =--
-function Logger.new(): any
+function Logger.new(name: string): any
     local self = classify(Logger)
     
-    self._name = ''
+    self._name = name and name or ''
     self._timestamps = false
     self._listen = true
     self._enabled = true
