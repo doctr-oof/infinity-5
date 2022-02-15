@@ -37,6 +37,10 @@ local require = require(game.ReplicatedStorage:WaitForChild('Infinity'))
 local Network         = { }
 Network.__classname   = 'NetworkNew'
 
+--= Controllers =--
+
+--= Other Classes =--
+
 --= Modules & Config =--
 local promise   = require('$lib/Promise')
 --local logger    = require('$
@@ -44,12 +48,25 @@ local promise   = require('$lib/Promise')
 --= Roblox Services =--
 local run_svc = game:GetService("RunService")
 
+
+--= Instance References =--
+
 --= Constants =--
 local IS_CLIENT = run_svc:IsClient()
 local ERRORS = {
     CANT_FIND_REMOTE_EVENT      = 'Could not find RemoteEvent <%s>, are you looking for a RemoteFunction?';
     CANT_FIND_REMOTE_FUNCTION   = 'Could not find RemoteFunction <%s>, are you looking for a RemoteEvent?';
 }
+
+--= Variables =--
+
+--= Shorthands =--
+
+--= Functions =--
+
+--= Class Internal =--
+
+--= Class API =--
 
 if not IS_CLIENT then
     -- don't expose this to the client
