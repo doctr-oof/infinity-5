@@ -18,6 +18,8 @@ local local_jobs    = script.Parent:WaitForChild('jobs')
 
 --= Variables =--
 local loaded_loops  = { }
+local loaded_ticks  = { }
+local ticking       = false
 
 --= Functions =--
 function lazy_load_folder(root: Instance): table
@@ -63,6 +65,10 @@ function load_jobs(target: Folder): nil
         end
         
         if job.PlayerAdded then
+            player_svc.PlayerAdded:Connect(function(client: Player)
+                job:PlayerAdded(client)
+            end)
+            
             for _, player in pairs(player_svc:GetPlayers()) do
                 task.defer(function()
                     job:PlayerAdded(player)
@@ -97,6 +103,10 @@ function load_jobs(target: Folder): nil
         if job.Update and job.UpdateRate then
             table.insert(loaded_loops, { job, job.UpdateRate, 0, false })
         end
+        
+        if job.Tick then
+            table.insert(loaded_ticks, job.TickPriority or 999, { job, job.TickRate or 1, 0 })
+        end
     end
 end
     
@@ -110,6 +120,22 @@ if #loaded_loops >= 0 then
                 loop[4] = false
             end
         end
+    end)
+    
+    run_svc.RenderStepped:Connect(function()
+        if ticking then return end
+        ticking = true
+        
+        for _, ticker in pairs(loaded_ticks) do
+            ticker[3] += 1
+            
+            if ticker[3] >= ticker[2] then
+                ticker[3] = 0
+                ticker[1]:Tick()
+            end
+        end
+        
+        ticking = false
     end)
 end
 
