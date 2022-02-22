@@ -13,12 +13,14 @@ local Classify         = { meta = { }, prototype = { } }
 --= Constants =--
 local SUPPRESS_ERROR   = false
 local MESSAGES         = {
-    NO_CLASS_NAME      = 'Failed to classify table - "__classname" must be defined.';
+    NO_CLASS_NAME = 'Failed to classify table - "__classname" must be defined.';
     READONLY_PROPERTY = 'Failed to set property "%s" of "%s" - property is read-only.';
     ZERO_DISPOSABLES = 'Cannot :_mark_disposables() with zero items provided.';
     INVALID_CLASS = '%q cannot inherit  %q - target dependency is not a valid Classify class.';
     INDEX_ALREADY_EXISTS = '%q cannot inherit %q - %q already exists in the inheritor.';
     PROPERTY_ALREADY_EXISTS = 'Duplicate inherited property %q from %q has been overwritten in %q.';
+    NO_PROPERTIES_DEFINED = '::GetPropertyChangedSignal() cannot be used on a class with no defined properties.';
+    NO_PROPERTY = '::GetPropertyChangedSignal() failed - property %q does not exist on class %q.';
 }
 
 --= Internal Functions =--
@@ -100,16 +102,27 @@ function Classify.meta.__newindex(self: table, key: string, value: any): nil
     
     if properties then
         local property = properties[key]
+        local p_signal = false
         
         if property then
             if property.set then
                 property.set(self, value)
                 success = true
+                p_signal = true
             end
             
             if property.bind and property.target then
                 property.target(self)[property.bind] = value
                 success = true
+                p_signal = true
+            end
+            
+            if p_signal then
+                for _, signal in pairs(rawget(self, '__meta').p_signals) do
+                    if signal[1] == key then
+                        signal[2]:Fire(value)
+                    end
+                end
             end
             
             if not property.bind and not property.set then
@@ -135,7 +148,7 @@ end
 function Classify.prototype:_mark_disposables(...): nil
     if #{...} > 0 then
         for _, item in pairs(...) do
-            table.insert(rawget(self, '__meta').cleanup, item)
+            table.insert(rawget(self, '__meta').disposables, item)
         end
     else
         err(MESSAGES.ZERO_DISPOSABLES)
@@ -220,6 +233,25 @@ function Classify.prototype:Inherit(dependency: any): table
     return self
 end
 
+function Classify.prototype:GetPropertyChangedSignal(target: string): RBXScriptConnection|nil
+    local properties = rawget(self, '__properties')
+    
+    if properties then
+        local property = properties[target]
+        
+        if property then
+            local event = Instance.new('BindableEvent')
+            table.insert(rawget(self, '__meta').p_signals, { target, event })
+            
+            return event.Event
+        else
+            err(MESSAGES.NO_PROPERTY, target, rawget(self, '__classname'))
+        end
+    else
+        err(MESSAGES.NO_PROPERTIES_DEFINED)
+    end
+end
+
 function Classify.prototype:Destroy(...): nil
     local clean_callbacks = rawget(self, '__meta').clean_callbacks
     
@@ -232,6 +264,8 @@ function Classify.prototype:Destroy(...): nil
 end
 
 Classify.prototype.inherit = Classify.prototype.Inherit
+Classify.prototype.markDisposable = Classify.prototype._mark_disposable
+Classify.prototype.markDisposables = Classify.prototype._mark_disposables
 
 --= Main Module Function =--
 function Classify.classify(class: table): any
@@ -251,7 +285,9 @@ function Classify.classify(class: table): any
         clean_callbacks = { rawget(proxy, '__cleaning') },
         d_index = { },
         d_newindex = { },
-        disposables = { }
+        disposables = { },
+        p_signals = { },
+        signals = { }
     })
     
     result = deep_copy(proxy)
