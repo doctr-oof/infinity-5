@@ -56,7 +56,7 @@ function Infinity(query: string|ModuleScript): any
             elseif result[node] then
                 result = result[node]
             else
-                warn(('[Skateworks] Failed to require %q - node/module %q not found.'):format(query, node))
+                warn(('[Infinity] Failed to require %q - node/module %q not found.'):format(query, node))
                 result = nil
             end
         end
