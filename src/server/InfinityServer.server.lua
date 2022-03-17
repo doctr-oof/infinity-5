@@ -52,12 +52,16 @@ function load_jobs(target: Folder): nil
     end)
     
     for _, job in pairs(modules) do
+        if job.Enabled == false then continue end
+        
         if job.Init then
             job:Init()
         end
     end
     
     for _, job in pairs(modules) do
+        if job.Enabled == false then continue end
+        
         if job.Run then
             task.defer(function()
                 job:Run()
@@ -109,36 +113,34 @@ function load_jobs(target: Folder): nil
         end
     end
 end
-    
-if #loaded_loops >= 0 then
-    run_svc.Stepped:Connect(function(...)
-        for _, loop in pairs(loaded_loops) do
-            if tick() - loop[3] >= loop[2] and not loop[4] then
-                loop[4] = true
-                loop[1]:Update(...)
-                loop[3] = tick()
-                loop[4] = false
-            end
-        end
-    end)
-    
-    run_svc.Stepped:Connect(function()
-        if ticking then return end
-        ticking = true
-        
-        for _, ticker in pairs(loaded_ticks) do
-            ticker[3] += 1
-            
-            if ticker[3] >= ticker[2] then
-                ticker[3] = 0
-                ticker[1]:Tick()
-            end
-        end
-        
-        ticking = false
-    end)
-end
 
 --= Initialize =--
 load_jobs(local_jobs)
 load_jobs(shared_jobs)
+
+run_svc.Stepped:Connect(function(...)
+    for _, loop in pairs(loaded_loops) do
+        if tick() - loop[3] >= loop[2] and not loop[4] then
+            loop[4] = true
+            loop[1]:Update(...)
+            loop[3] = tick()
+            loop[4] = false
+        end
+    end
+end)
+
+run_svc.Stepped:Connect(function()
+    if ticking then return end
+    ticking = true
+    
+    for _, ticker in pairs(loaded_ticks) do
+        ticker[3] += 1
+        
+        if ticker[3] >= ticker[2] then
+            ticker[3] = 0
+            ticker[1]:Tick()
+        end
+    end
+    
+    ticking = false
+end)

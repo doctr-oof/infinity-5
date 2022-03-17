@@ -10,7 +10,7 @@
         No documentation provided.
 --]]
 
---= Constants =--
+--= Object References =--
 local run_svc       = game:GetService('RunService')
 local player_svc    = game:GetService('Players')
 local shared_jobs   = game.ReplicatedStorage:WaitForChild('jobs')
@@ -20,6 +20,7 @@ local local_jobs    = script.Parent:WaitForChild('jobs')
 local loaded_loops  = { }
 local loaded_ticks  = { }
 local ticking       = false
+local last_tick     = 0
 
 --= Functions =--
 function lazy_load_folder(root: Instance): table
@@ -52,12 +53,16 @@ function load_jobs(target: Folder): nil
     end)
     
     for _, job in pairs(modules) do
+        if job.Enabled == false then continue end
+        
         if job.Init then
             job:Init()
         end
     end
     
     for _, job in pairs(modules) do
+        if job.Enabled == false then continue end
+        
         if job.Run then
             task.defer(function()
                 job:Run()
@@ -109,36 +114,38 @@ function load_jobs(target: Folder): nil
         end
     end
 end
-    
-if #loaded_loops >= 0 then
-    run_svc.Stepped:Connect(function(...)
-        for _, loop in pairs(loaded_loops) do
-            if tick() - loop[3] >= loop[2] and not loop[4] then
-                loop[4] = true
-                loop[1]:Update(...)
-                loop[3] = tick()
-                loop[4] = false
-            end
-        end
-    end)
-    
-    run_svc.RenderStepped:Connect(function()
-        if ticking then return end
-        ticking = true
-        
-        for _, ticker in pairs(loaded_ticks) do
-            ticker[3] += 1
-            
-            if ticker[3] >= ticker[2] then
-                ticker[3] = 0
-                ticker[1]:Tick()
-            end
-        end
-        
-        ticking = false
-    end)
-end
 
 --= Initialize =--
 load_jobs(local_jobs)
 load_jobs(shared_jobs)
+
+run_svc.Stepped:Connect(function(alpha: number, delta: number)
+    for _, loop in pairs(loaded_loops) do
+        if tick() - loop[3] >= loop[2] and not loop[4] then
+            loop[4] = true
+            loop[1]:Update(alpha, delta)
+            loop[3] = tick()
+            loop[4] = false
+        end
+    end
+end)
+
+run_svc.RenderStepped:Connect(function(delta: number)
+    if ticking then return end
+    ticking = true
+    
+    for index, ticker in pairs(loaded_ticks) do
+        ticker[3] += 1
+        
+        if ticker[3] >= ticker[2] then
+            _G.INF_CUR_TICK = index
+            last_tick = tick()
+            ticker[3] = 0
+            ticker[1]:Tick(delta)
+            _G.INF_LAST_TICK = index
+            _G.INF_TICK_DELTA = (tick() - last_tick)
+        end
+    end
+    
+    ticking = false
+end)
