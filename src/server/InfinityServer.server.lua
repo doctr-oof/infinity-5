@@ -109,7 +109,13 @@ function load_jobs(target: Folder): nil
         end
         
         if job.Tick then
-            table.insert(loaded_ticks, job.TickPriority or 999, { job, job.TickRate or 1, 0 })
+            local target_priority = job.TickPriority or 999
+            
+            if loaded_ticks[target_priority] then
+                target_priority += 1
+            end
+            
+            table.insert(loaded_ticks, target_priority, { job, job.TickRate or 1, 0 })
         end
     end
 end
