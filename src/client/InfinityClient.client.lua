@@ -53,6 +53,16 @@ function load_jobs(target: Folder): nil
     end)
     
     for _, job in pairs(modules) do
+        if job.Enabled == false then return end
+        
+        if job.Immediate then
+            task.spawn(function()
+                job:Immediate()
+            end)
+        end
+    end
+    
+    for _, job in pairs(modules) do
         if job.Enabled == false then continue end
         
         if job.Init then
