@@ -6,32 +6,25 @@
     Infinity Animator 3.0
     By FriendlyBiscuit
     
-    INCOMPLETE - DO NOT USE
+    EARLY-ALPHA TESTING. USE NOT RECOMMENDED!
 --]]
 
 --= Root Module Table =--
 local Animator3 = { }
 
 --= Infinity Integration =--
-local require   = require(game:GetService('ReplicatedStorage'):WaitForChild('Infinity'))
+local require   = require(game.ReplicatedStorage:WaitForChild('Infinity'))
 
 --= External Classes =--
-local Logger    = require('$classes/Logger')
+local Animation = require(script:WaitForChild('Animation'))
 
 --= Services & Requires =--
 local tween_svc = game:GetService('TweenService')
 local run_svc   = game:GetService('RunService')
 
---= Errors =--
-local errors    = {
-    
-}
-
---= Internal Functions =--
-
 --= Generic Tween API =--
 function Animator3.CreateAnimation(): nil
-    
+    return Animation.new()
 end
 
 function Animator3.CreateTween(args: table): Tween
@@ -47,7 +40,7 @@ function Animator3.CreateTween(args: table): Tween
         args.Properties)
 end
 
-function Animator3.Animate(args: table): nil
+function Animator3:Tween(args: table): nil
     local tween = Animator3.CreateTween(args)
     local complete = false
     
@@ -55,6 +48,8 @@ function Animator3.Animate(args: table): nil
         complete = true
         tween:Destroy()
     end)
+    
+    tween:Play()
     
     if not args.Async then
         while not complete do run_svc.Heartbeat:Wait() end
