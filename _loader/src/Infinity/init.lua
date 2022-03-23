@@ -39,6 +39,10 @@ function get_root_path(first_node: string): any
     return root, fix_len
 end
 
+function alert(query: string, node: string): nil
+    warn(('[Infinity] Failed to require %q - node/module %q not found.'):format(query, node))
+end
+
 --= Main Loader Function =--
 function Infinity(query: string|ModuleScript): any
     if type(query) == 'string' then
@@ -50,13 +54,16 @@ function Infinity(query: string|ModuleScript): any
         
         for _, node in pairs(nodes) do
             if not result then
-                if root[node] then
+                if root:FindFirstChild(node) then
                     result = root[node]
+                else
+                    alert(query, node)
+                    break
                 end
             elseif result[node] then
                 result = result[node]
             else
-                warn(('[Infinity] Failed to require %q - node/module %q not found.'):format(query, node))
+                alert(query, node)
                 result = nil
             end
         end
