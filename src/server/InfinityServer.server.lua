@@ -1,13 +1,10 @@
 --[[
-    InfinityClient.client.lua
+    InfinityServer.server.lua
     FriendlyBiscuit
     Created on 09/25/2021 @ 00:30:41
     
     Description:
-        Initializes the client/server jobs and loops.
-    
-    Documentation:
-        No documentation provided.
+        Initializes the server jobs and loops.
 --]]
 
 --= Constants =--
@@ -16,19 +13,56 @@ local player_svc    = game:GetService('Players')
 local shared_jobs   = game.ReplicatedStorage:WaitForChild('jobs')
 local local_jobs    = script.Parent:WaitForChild('jobs')
 
+--= Messages =--
+local MESSAGES      = {
+    NOT_FAST_ENOUGH = '%s\'s ::Immediate() callback ran too slow. This function should run instantly; check for yields.'
+}
+
 --= Variables =--
 local loaded_loops  = { }
 local loaded_ticks  = { }
 local ticking       = false
 
 --= Functions =--
+function alert(message: string, ...): nil
+    local final_str
+    
+    final_str = ('[InfinityServer] '):format() .. message
+    
+    if #{...} > 0 then
+        for _, data in pairs({...}) do
+            final_str = final_str:format(data)
+        end
+    end
+    
+    warn(final_str)
+end
+
+function run_immediate(module: table, callback: () -> ()): nil
+    local routine = coroutine.create(callback)
+    
+    coroutine.resume(routine, module)
+    
+    if coroutine.status(routine) ~= 'dead' then
+        alert(MESSAGES.NOT_FAST_ENOUGH, module.__jobname)
+    end
+end
+
 function lazy_load_folder(root: Instance): table
     local result = { }
     
     local function recurse(object: Instance): nil
         for _, child in pairs(object:GetChildren()) do
             if child:IsA('ModuleScript') then
-                result[child.Name] = require(child)
+                local module_data = require(child)
+                
+                module_data.__jobname = child.Name
+                
+                if module_data.Immediate and module_data.Enabled ~= false then
+                    run_immediate(module_data, module_data.Immediate)
+                end
+                
+                result[child.Name] = module_data
             elseif child:IsA('Folder') then
                 recurse(child)
             end
@@ -50,16 +84,6 @@ function load_jobs(target: Folder): nil
         
         return false
     end)
-    
-    for _, job in pairs(modules) do
-        if job.Enabled == false then return end
-        
-        if job.Immediate then
-            task.spawn(function()
-                job:Immediate()
-            end)
-        end
-    end
     
     for _, job in pairs(modules) do
         if job.Enabled == false then continue end
