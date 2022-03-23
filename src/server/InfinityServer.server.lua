@@ -130,12 +130,6 @@ function load_jobs(target: Folder): nil
             end)
         end
         
-        if job.RenderStepped then
-            run_svc.RenderStepped:Connect(function(...)
-                job:RenderStepped(...)
-            end)
-        end
-        
         if job.Update and job.UpdateRate then
             table.insert(loaded_loops, { job, job.UpdateRate, 0, false })
         end
