@@ -1,5 +1,7 @@
 
-**Infinity 5** (or just **Infinity**) is a lightweight job executor and module loader that aims to speed the project setup and controller creation process.
+# Introduction
+
+**Infinity 5** (or just **Infinity**) is a lightweight job executor and module loader that aims to speed the project setup and controller creation process. It serves as the backbone of most of my projects. It's whole purpose is to let you quickly and easily write client and server code without excess overhead, worrying about order of execution, etc.
 
 # Getting Started
 
