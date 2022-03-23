@@ -1,11 +1,13 @@
 
-**Infinity 5** (or just **Infinity**) is a lightweight job executor and module loader that aims to speed the project setup and controller creation process.
+# Introduction
+
+**Infinity 5** (or just **Infinity**) is a lightweight job executor and module loader that aims to speed the project setup and controller creation process. It serves as the backbone of most of my projects. It's whole purpose is to let you quickly and easily write client and server code without excess overhead, worrying about order of execution, etc.
 
 # Getting Started
 
 Setting up Infinity for your project requires little work on your part. All you need to do is:
 1) Clone the repo to your local drive.
-2) Copy all files and folder EXCEPT the `.git` folder to your project.
+2) Copy all files and folders EXCEPT the `.git` folder to your project.
 3) Done!
 
 # Understanding Project Hierarchy
