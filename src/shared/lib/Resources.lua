@@ -21,7 +21,12 @@
 local Resources = { }
 
 --= Object References =--
-local storage   = game.ReplicatedStorage:WaitForChild('assets')
+local storage   = game.ReplicatedStorage:FindFirstChild('assets')
+
+if not storage then
+    storage = Instance.new('Folder')
+    storage.Name = 'assets'
+end
 
 --= API =--
 function Resources:Fetch(query: string): any
