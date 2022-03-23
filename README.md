@@ -7,7 +7,7 @@
 
 Setting up Infinity for your project requires little work on your part. All you need to do is:
 1) Clone the repo to your local drive.
-2) Copy all files and folder EXCEPT the `.git` folder to your project.
+2) Copy all files and folders EXCEPT the `.git` folder to your project.
 3) Done!
 
 # Understanding Project Hierarchy
