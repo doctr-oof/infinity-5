@@ -57,9 +57,11 @@ function lazy_load_folder(root: Instance): table
             if child:IsA('ModuleScript') then
                 local module_data = require(child)
                 
+                if module_data.Enabled == false then continue end
+                
                 module_data.__jobname = child.Name
                 
-                if module_data.Immediate and module_data.Enabled ~= false then
+                if module_data.Immediate then
                     run_immediate(module_data, module_data.Immediate)
                 end
                 
@@ -87,16 +89,12 @@ function load_jobs(target: Folder): nil
     end)
     
     for _, job in pairs(modules) do
-        if job.Enabled == false then continue end
-        
         if job.Init then
             job:Init()
         end
     end
     
     for _, job in pairs(modules) do
-        if job.Enabled == false then continue end
-        
         if job.Run then
             task.defer(function()
                 job:Run()
