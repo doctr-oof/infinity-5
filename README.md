@@ -87,7 +87,7 @@ Each job has a set of optional, pre-defined callbacks that you can use to quickl
 | **::Heartbeat(delta: number)** | No | Binds `Heartbeat`. Cannot be disconnected. |
 | **::RenderStepped(delta: number)** | No | Binds `RenderStepped`. Cannot be disconnected. CLIENT ONLY. |
 | **::Update()** | Yes, only itself | Runs in set intervals of *time* if `UpdateRate` is specified. Cannot be stopped once started. |
-| **::Tick()** | Yes, all ticks | Runs is set intervals of *frames* in order of `TickPriority` (default 999). Holds up lower priority tickers during execution, so make your code quick! Server can run up to 30 times per second, client up to 60. |
+| **::Tick()** | Yes, all ticks | Runs in set intervals of *frames* in order of `TickPriority` (default 999). Holds up lower priority tickers during execution, so make your code quick! Server can run up to 30 times per second, client up to 60. |
 
 ## Execution Flow
 Both the client and server executors load and run jobs in the same fashion:
