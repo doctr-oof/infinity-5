@@ -7,7 +7,7 @@
         Initializes the server jobs and loops.
 --]]
 
---= Constants =--
+--= Object References =--
 local run_svc       = game:GetService('RunService')
 local player_svc    = game:GetService('Players')
 local shared_jobs   = game.ReplicatedStorage:WaitForChild('jobs')
