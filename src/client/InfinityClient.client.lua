@@ -8,21 +8,25 @@
 --]]
 
 --= Object References =--
-local run_svc       = game:GetService('RunService')
-local player_svc    = game:GetService('Players')
-local shared_jobs   = game.ReplicatedStorage:WaitForChild('jobs')
-local local_jobs    = script.Parent:WaitForChild('jobs')
+local run_svc               = game:GetService('RunService')
+local player_svc            = game:GetService('Players')
+local shared_jobs           = game.ReplicatedStorage:WaitForChild('jobs')
+local local_jobs            = script.Parent:WaitForChild('jobs')
+
+--= Flags =--
+local ALLOW_OLD_RUN         = false
 
 --= Messages =--
-local MESSAGES      = {
-    NOT_FAST_ENOUGH = '%s\'s ::Immediate() callback ran too slow. This function should run instantly; check for yields.'
+local MESSAGES              = {
+    NOT_FAST_ENOUGH = '%s\'s ::Immediate() callback ran too slow. This function should run instantly; check for yields.',
+    OLD_RUN_DISABLED = '%s\'s ::Run() callback will be ignored since the ALLOW_OLD_RUN flag is disabled. Use ::InitAsync() instead.'
 }
 
 --= Variables =--
-local loaded_loops  = { }
-local loaded_ticks  = { }
-local ticking       = false
-local last_tick     = 0
+local loaded_loops          = { }
+local loaded_ticks          = { }
+local ticking               = false
+local last_tick             = 0
 
 --= Functions =--
 function alert(message: string, ...): nil
@@ -95,10 +99,16 @@ function load_jobs(target: Folder): nil
     end
     
     for _, job in pairs(modules) do
+        if job.InitAsync then
+            task.defer(function() job:InitAsync() end)
+        end
+        
         if job.Run then
-            task.defer(function()
-                job:Run()
-            end)
+            if ALLOW_OLD_RUN then
+                task.defer(function() job:Run() end)
+            else
+                alert(MESSAGES.OLD_RUN_DISABLED, job.__jobname)
+            end
         end
         
         if job.PlayerAdded then
