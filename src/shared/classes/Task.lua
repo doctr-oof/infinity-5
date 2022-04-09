@@ -155,7 +155,7 @@ function Task:__cleaning()
 end
 
 --= Class API =--
-function Task:Tick(async: bool)
+function Task:Tick(async: boolean)
     if not self._overlap and self._ticking then
         out.warn('::Tick() call rejected for Task %s - previous tick has not completed.', self._guid)
         return
@@ -170,7 +170,7 @@ function Task:Tick(async: bool)
     do_tick(self, async)
 end
 
-function Task:TickForce(async: bool)
+function Task:TickForce(async: boolean)
     do_tick(self, async)
 end
 
@@ -236,7 +236,7 @@ function Task:Reset()
 end
 
 --= Class Constructor =--
-function Task.new(callback: Function, interval: number)
+function Task.new(callback: ()->(), interval: number)
     local self = classify(Task)
     
     self._async = true

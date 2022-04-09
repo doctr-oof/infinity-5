@@ -32,7 +32,7 @@ local out           = require('$util/EasyOutput')
 local events        = { }
 
 --= Job API =--
-function Replicator:Listen(name: string, callback: Function): nil
+function Replicator:Listen(name: string, callback: (any)->()): nil
     if events[name] then
         table.insert(events[name], callback)
     else
@@ -45,7 +45,7 @@ function Replicator:Send(name: string, ...): nil
 end
 
 --= Job Initializers =--
-function Replicator:Run(): nil
+function Replicator:InitAsync(): nil
     network:Fired('PACKET', function(name: string, ...)
         local event_data = events[name]
         

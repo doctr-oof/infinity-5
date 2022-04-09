@@ -19,7 +19,7 @@ local whitelist         = { }
 local blacklist         = { 'LODServer', 'LODClient' }
 
 --= API =--
-function EasyOutput.print(msg: variant, ...)
+function EasyOutput.print(msg: any, ...)
     if suppress_print then return end
     
     local name = getfenv(2).script.Name
@@ -36,7 +36,7 @@ function EasyOutput.print(msg: variant, ...)
     print(output)
 end
 
-function EasyOutput.warn(msg: variant, ...)
+function EasyOutput.warn(msg: any, ...)
     local output = ('[%s] %s'):format(getfenv(2).script.Name, msg)
     
     if #{...} > 0 then

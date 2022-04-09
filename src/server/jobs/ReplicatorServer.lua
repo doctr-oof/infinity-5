@@ -8,7 +8,7 @@
         sent to the server, as well as send data to clients.
     
     Documentation:
-        <nil> ::Listen(name: string, callback: Function)
+        <nil> ::Listen(name: string, callback: (client: Player, ...)->())
         -> Listens to the target event and fires the callback with any data passed.
            Since this is on the server, the first argument passed will always be the
            player that fired this event.
@@ -40,7 +40,7 @@ local player_svc    = game:GetService('Players')
 local events        = { }
 
 --= Job API =--
-function Replicator:Listen(name: string, callback: Function): nil
+function Replicator:Listen(name: string, callback: (client: Player, any)->()): nil
     if events[name] then
         table.insert(events[name], callback)
     else
@@ -65,7 +65,7 @@ function Replicator:Broadcast(name: string, target: Player, ...): nil
 end
 
 --= Job Initializers =--
-function Replicator:Run(): nil
+function Replicator:InitAsync(): nil
     network:Fired('PACKET', function(client: Player, name: string, ...)
         local event_data = events[name]
         
