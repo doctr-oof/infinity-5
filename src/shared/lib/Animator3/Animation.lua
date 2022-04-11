@@ -56,11 +56,11 @@ function create_tween(args: table): Tween
         args.Properties)
 end
 
-function format_waypoint(waypoint: table): table
+function format_waypoint(object: Instance, waypoint: table): table
     local long = #waypoint == 9
     
     return {
-        Instance = waypoint[1],
+        Instance = object,
         Length = waypoint[2],
         Style = waypoint[3],
         Direction = waypoint[4],
@@ -150,7 +150,7 @@ function Animation:Play(): nil
                 if not self._running or self._stopped then break end
                 
                 if object then
-                    local clean_waypoint_args = format_waypoint(waypoint)
+                    local clean_waypoint_args = format_waypoint(object, waypoint)
                     local waypoint_tween = create_tween(clean_waypoint_args)
                     local complete = false
                     
