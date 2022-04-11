@@ -45,7 +45,7 @@ function Replicator:Send(name: string, ...): nil
 end
 
 --= Job Initializers =--
-function Replicator:Run(): nil
+function Replicator:InitAsync(): nil
     network:Fired('PACKET', function(name: string, ...)
         local event_data = events[name]
         
