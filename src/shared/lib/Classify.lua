@@ -5,6 +5,7 @@
     \__/_/\_,_/___/___/_/_/ \_, /
     Classify - OOP Helper  /___/
     By FriendlyBiscuit
+    v2.0.0
 --]]
 
 --= Root Table =--
@@ -82,6 +83,8 @@ function Classify.meta.__index(self: table, key: string): any
                 return property.get(self)
             elseif property.bind and property.target then
                 return property.target(self)[property.bind]
+            elseif property.internal then
+                return rawget(self, property.internal)
             else
                 err(MESSAGES.NOREAD_PROPERTY, key, rawget(self, '__classname'))
             end
@@ -105,6 +108,12 @@ function Classify.meta.__newindex(self: table, key: string, value: any): nil
         local p_signal = false
         
         if property then
+            if property.internal then
+                rawset(self, property.internal, value)
+                success = true
+                p_signal = true
+            end
+            
             if property.set then
                 property.set(self, value)
                 success = true
@@ -125,8 +134,8 @@ function Classify.meta.__newindex(self: table, key: string, value: any): nil
                 end
             end
             
-            if not property.bind and not property.set then
-                err(MESSAGES.READONLY, key, rawget(self, '__classname'))
+            if not property.internal and not property.bind and not property.set then
+                err(MESSAGES.READONLY_PROPERTY, key, rawget(self, '__classname'))
             end
         end
     end
@@ -230,6 +239,12 @@ function Classify.prototype:Inherit(dependency: any): table
         end
     end
     
+    local inherit_callback = rawget(dependency, '__inherited')
+    
+    if inherit_callback then
+        inherit_callback(dependency, self)
+    end
+    
     return self
 end
 
@@ -256,7 +271,7 @@ function Classify.prototype:Destroy(...): nil
     local clean_callbacks = rawget(self, '__meta').clean_callbacks
     
     for _, callback in pairs(clean_callbacks) do
-        callback(...)
+        callback(self, ...)
     end
     
     self:_dispose()
@@ -266,6 +281,8 @@ end
 Classify.prototype.inherit = Classify.prototype.Inherit
 Classify.prototype.markDisposable = Classify.prototype._mark_disposable
 Classify.prototype.markDisposables = Classify.prototype._mark_disposables
+Classify.prototype._markDisposable = Classify.prototype._mark_disposable
+Classify.prototype._markDisposables = Classify.prototype._mark_disposables
 
 --= Main Module Function =--
 function Classify.classify(class: table): any
