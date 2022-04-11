@@ -23,8 +23,8 @@ local tween_svc = game:GetService('TweenService')
 local run_svc   = game:GetService('RunService')
 
 --= Generic Tween API =--
-function Animator3.CreateAnimation(): nil
-    return Animation.new()
+function Animator3.CreateAnimation(...): nil
+    return Animation.new(...)
 end
 
 function Animator3.CreateTween(args: table): Tween
