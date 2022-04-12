@@ -14,7 +14,7 @@ local shared_jobs           = game.ReplicatedStorage:WaitForChild('jobs')
 local local_jobs            = script.Parent:WaitForChild('jobs')
 
 --= Flags =--
-local ALLOW_OLD_RUN         = false
+local ALLOW_OLD_RUN         = true
 
 --= Messages =--
 local MESSAGES              = {
