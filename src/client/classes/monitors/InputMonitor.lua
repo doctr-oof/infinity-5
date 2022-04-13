@@ -21,7 +21,7 @@ InputMonitor.__classname    = 'InputMonitor'
 local classify              = require('$lib/Classify')
 
 --= Roblox Services =--
-local input_svc             = game:GetService('InputService')
+local input_svc             = game:GetService("UserInputService")
 
 --= Class Internal =--
 function InputMonitor:_can_process(input: InputObject): boolean
@@ -65,11 +65,11 @@ function InputMonitor:_create_signal(): nil
 end
 
 --= Class API =--
-function InputMonitor:Bind(context: table, callback: Function): nil
+function InputMonitor:Bind(context: table, callback: (InputObject, boolean)->()): nil
     table.insert(self._binds, { context, callback })
 end
 
-function InputMonitor:BindOnce(context: table, callback: Function): nil
+function InputMonitor:BindOnce(context: table, callback: (InputObject, boolean)->()): nil
     table.insert(self._binds, { context, callback, true })
 end
 

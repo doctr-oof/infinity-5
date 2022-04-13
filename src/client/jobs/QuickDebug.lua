@@ -23,7 +23,7 @@ local player_gui    = local_player:WaitForChild('PlayerGui')
 local list
 
 --= Job API =--
-function QuickDebug:AddDebugButton(text: string, callback: Function): TextButton
+function QuickDebug:AddDebugButton(text: string, callback: ()->()): TextButton
     while not list do task.wait() end
     
     local button = Instance.new('TextButton', list)
