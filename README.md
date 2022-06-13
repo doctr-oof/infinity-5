@@ -1,4 +1,5 @@
 
+
 # Introduction
 
 **Infinity 5** (or just **Infinity**) is a lightweight job executor and module loader that aims to speed the project setup and controller creation process. It serves as the backbone of most of my projects. It's whole purpose is to let you quickly and easily write client and server code without excess overhead, worrying about order of execution, etc.
@@ -78,16 +79,16 @@ Each job has a pre-defined list of semi-optional properties that can be specifie
 Each job has a set of optional, pre-defined callbacks that you can use to quickly get your code executed in a specified manner or order. This list order is the same order in which these callbacks are processed.
 | Function Name | Yields | Description |
 |--|--|--|
-| **::Immediate()** | No | Runs during lazy loading. Does not respect priority. |
-| **::Init()** | Yes | Runs after lazy loading, one at a time per-job. Respects priority. Will hold up lower priority jobs until execution completes. |
-| **::Run()** | No | Runs after lazy loading, one at a time per-job. Respects priority. Will not hold up lower priority jobs. |
-| **::PlayerAdded(client: Player)** | No | Binds `PlayerAdded` and manually triggers once at runtime to account for delayed startup. Cannot be disconnected. |
-| **::PlayerLeft(client: Player)** | No | Binds `PlayerRemoving`. Cannot be disconnected. |
-| **::Stepped(time: number, delta: number)** | No | Binds `Stepped`. Cannot be disconnected. |
-| **::Heartbeat(delta: number)** | No | Binds `Heartbeat`. Cannot be disconnected. |
-| **::RenderStepped(delta: number)** | No | Binds `RenderStepped`. Cannot be disconnected. CLIENT ONLY. |
-| **::Update()** | Yes, only itself | Runs in set intervals of *time* if `UpdateRate` is specified. Cannot be stopped once started. |
-| **::Tick()** | Yes, all ticks | Runs in set intervals of *frames* in order of `TickPriority` (default 999). Holds up lower priority tickers during execution, so make your code quick! Server can run up to 30 times per second, client up to 60. |
+| `::Immediate()` | No | Runs during lazy loading. Does not respect priority. |
+| `::Init()` | Yes | Runs after lazy loading, one at a time per-job. Respects priority. Will hold up lower priority jobs until execution completes. |
+| `::InitAsync()` `::Run() [deprecated, requires ALLOW_OLD_RUN]` | No | Runs after lazy loading, one at a time per-job. Respects priority. Will not hold up lower priority jobs. |
+| `::PlayerAdded(client: Player)` | No | Binds `PlayerAdded` and manually triggers once at runtime to account for delayed startup. Cannot be disconnected. |
+| `::PlayerLeft(client: Player)` | No | Binds `PlayerRemoving`. Cannot be disconnected. |
+| `::Stepped(time: number, delta: number)` | No | Binds `Stepped`. Cannot be disconnected. |
+| `::Heartbeat(delta: number)` | No | Binds `Heartbeat`. Cannot be disconnected. |
+| `::RenderStepped(delta: number)` | No | Binds `RenderStepped`. Cannot be disconnected. CLIENT ONLY. |
+| `::Update()` | Yes, only itself | Runs in set intervals of *time* if `UpdateRate` is specified. Cannot be stopped once started. |
+| `::Tick()` | Yes, all ticks | Runs in set intervals of *frames* in order of `TickPriority` (default 999). Holds up lower priority tickers during execution, so make your code quick! Server can run up to 30 times per second, client up to 60. |
 
 ## Execution Flow
 Both the client and server executors load and run jobs in the same fashion:
