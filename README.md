@@ -1,5 +1,6 @@
 
 
+
 # Introduction
 
 **Infinity 5** (or just **Infinity**) is a lightweight job executor and module loader that aims to speed the project setup and controller creation process. It serves as the backbone of most of my projects. It's whole purpose is to let you quickly and easily write client and server code without excess overhead, worrying about order of execution, etc.
@@ -51,6 +52,12 @@ Once you have imported the loader, you can require modules directly from their p
 local platform = require('util/Platform') -- points to src/client/util/Platform
 ```
 
+**NEW IN VERSION 6:** You can now require modules without directly pathing to them. For example:
+
+```lua
+local platform = require('Platform')
+```
+
 ## Path Contexts
 When requiring a module, Infinity uses the current network context to determine which folder to search in. For example, if a **client** job is requiring **util/Platform**, the loader will check for `client/util/Platform`. Whereas if the **server** requires that module, the loader will check `server/util/Platform`, which does not exist. *This will cause your scripts to error.*
 
@@ -61,6 +68,12 @@ Knowing the above information, you might be wondering how to require a module lo
 
 ```lua
 local maid = require('$lib/Maid') -- points to src/shared/lib/Maid
+```
+
+**NEW IN VERSION 6:** You can now require modules without directly pathing to them. For example:
+
+```lua
+local maid = require('$Maid')
 ```
 
 # Understanding and Creating Jobs
@@ -81,7 +94,7 @@ Each job has a set of optional, pre-defined callbacks that you can use to quickl
 |--|--|--|
 | `::Immediate()` | No | Runs during lazy loading. Does not respect priority. |
 | `::Init()` | Yes | Runs after lazy loading, one at a time per-job. Respects priority. Will hold up lower priority jobs until execution completes. |
-| `::InitAsync()` `::Run() [deprecated, requires ALLOW_OLD_RUN]` | No | Runs after lazy loading, one at a time per-job. Respects priority. Will not hold up lower priority jobs. |
+| `::InitAsync()` | No | Runs after lazy loading, one at a time per-job. Respects priority. Will not hold up lower priority jobs. |
 | `::PlayerAdded(client: Player)` | No | Binds `PlayerAdded` and manually triggers once at runtime to account for delayed startup. Cannot be disconnected. |
 | `::PlayerLeft(client: Player)` | No | Binds `PlayerRemoving`. Cannot be disconnected. |
 | `::Stepped(time: number, delta: number)` | No | Binds `Stepped`. Cannot be disconnected. |
@@ -89,6 +102,23 @@ Each job has a set of optional, pre-defined callbacks that you can use to quickl
 | `::RenderStepped(delta: number)` | No | Binds `RenderStepped`. Cannot be disconnected. CLIENT ONLY. |
 | `::Update()` | Yes, only itself | Runs in set intervals of *time* if `UpdateRate` is specified. Cannot be stopped once started. |
 | `::Tick()` | Yes, all ticks | Runs in set intervals of *frames* in order of `TickPriority` (default 999). Holds up lower priority tickers during execution, so make your code quick! Server can run up to 30 times per second, client up to 60. |
+
+## Contextual Flags
+In version 6.0 and forward, Infinity now allows you to create and distribute Flag data to all jobs.
+
+### Flag File Locations
+Flag files are modules that essentially store a set of constants that can be access in any job. They are located as follows:
+**/src/client/_executor/Flags.lua** -> Client-only Flags.
+**/src/server/_executor/Flags.lua** -> Server-only Flags.
+
+Flags can be accessed from any Infinity main-executor callback (e.g. `::InitAsync()`) via `self`:
+```lua
+function MyJob:InitAsync()
+    if self.FLAGS.DEVELOPER_MODE then
+        print('Developer mode enabled!')
+    end
+end
+```
 
 ## Execution Flow
 Both the client and server executors load and run jobs in the same fashion:
