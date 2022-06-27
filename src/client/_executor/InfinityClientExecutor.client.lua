@@ -80,7 +80,11 @@ local function lazy_load_folder(root: Instance): {table}
                     end
                 end
                 
-                result[child.Name] = module_data
+                if not module_data.Priority then
+                    module_data.Priority = #result + 1
+                end
+                
+                table.insert(result, module_data)
             else
                 recurse(child)
             end
@@ -103,8 +107,8 @@ local function load_jobs(target: Folder)
         return false
     end)
     
-    for _, member in pairs(preloaded_members) do
-        for _, job in pairs(job_modules) do
+    for _, member in ipairs(preloaded_members) do
+        for _, job in ipairs(job_modules) do
             local target_callback = job[member.Alias]
             
             if target_callback then
